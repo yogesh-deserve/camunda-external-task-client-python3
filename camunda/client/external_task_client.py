@@ -27,7 +27,7 @@ class ExternalTaskClient:
         self.external_task_base_url = engine_base_url + "/external-task"
         self.config = type(self).default_config
         self.config.update(config)
-        self.is_debug = config.get('isDebug', False)
+        self.is_debug = config.get('isDebug', True)
         self._log_with_context(f"Created External Task client with config: {config}")
 
     def get_fetch_and_lock_url(self):
