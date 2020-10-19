@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_12xnypd" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.1">
+  <bpmn:process id="MANUAL_REVIEW_EXAMPLE" name="Manual Review Example" isExecutable="true">
+    <bpmn:endEvent id="END" name="End">
+      <bpmn:incoming>Flow_14ak1nt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="STEP_2" name="Step 2" camunda:type="external" camunda:topic="STEP_2">
+      <bpmn:incoming>Flow_0zwe4mv</bpmn:incoming>
+      <bpmn:outgoing>Flow_14ak1nt</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="STEP_1" name="Step 1" camunda:type="external" camunda:topic="STEP_1">
+      <bpmn:incoming>Flow_0bo5gvw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zwe4mv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:startEvent id="START" name="Start">
+      <bpmn:outgoing>Flow_0bo5gvw</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_14ak1nt" sourceRef="STEP_2" targetRef="END" />
+    <bpmn:sequenceFlow id="Flow_0zwe4mv" sourceRef="STEP_1" targetRef="STEP_2" />
+    <bpmn:sequenceFlow id="Flow_0bo5gvw" sourceRef="START" targetRef="STEP_1" />
+    <bpmn:boundaryEvent id="BPMN_ERROR" name="BPMN Error" attachedToRef="STEP_1">
+      <bpmn:outgoing>Flow_0xg1iwn</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1v5tyy1" errorRef="Error_12qitk4" camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0xg1iwn" sourceRef="BPMN_ERROR" targetRef="MANUAL_REVIEW" />
+    <bpmn:userTask id="MANUAL_REVIEW" name="Manual Review">
+      <bpmn:incoming>Flow_0xg1iwn</bpmn:incoming>
+    </bpmn:userTask>
+  </bpmn:process>
+  <bpmn:error id="Error_12qitk4" name="BPMN_ERROR" errorCode="BPMN_ERROR" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="MANUAL_REVIEW_EXAMPLE">
+      <bpmndi:BPMNEdge id="Flow_14ak1nt_di" bpmnElement="Flow_14ak1nt">
+        <di:waypoint x="540" y="120" />
+        <di:waypoint x="632" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zwe4mv_di" bpmnElement="Flow_0zwe4mv">
+        <di:waypoint x="350" y="120" />
+        <di:waypoint x="440" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bo5gvw_di" bpmnElement="Flow_0bo5gvw">
+        <di:waypoint x="195" y="120" />
+        <di:waypoint x="250" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xg1iwn_di" bpmnElement="Flow_0xg1iwn">
+        <di:waypoint x="320" y="178" />
+        <di:waypoint x="320" y="260" />
+        <di:waypoint x="440" y="260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1mwzhih_di" bpmnElement="END">
+        <dc:Bounds x="632" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="640" y="145" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1lhbhg2_di" bpmnElement="STEP_2">
+        <dc:Bounds x="440" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1kskaz5_di" bpmnElement="STEP_1">
+        <dc:Bounds x="250" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_04lgurc_di" bpmnElement="START">
+        <dc:Bounds x="159" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="165" y="145" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ggbpns_di" bpmnElement="MANUAL_REVIEW">
+        <dc:Bounds x="440" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1xnnk3d_di" bpmnElement="BPMN_ERROR">
+        <dc:Bounds x="302" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="360" y="243" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
