@@ -87,7 +87,6 @@ def main():
     # ----------------------------------------------------------------------------------------------------------------
     # Scenario: Manual review triggered by XPN task and then Manual review task raises reject error.
     # Reject task should get triggered
-    # http://localhost:8080/engine-rest/history/activity-instance?processInstanceId=d7a9d760-11ef-11eb-8a45-0242ac130003&sortBy=startTime&sortOrder=asc
     # topics = [
     #     (["REQUEST_IDV_DATA", "UPDATE_IDV_DATA",
     #       "REQUEST_CAPTURE_DATA", "UPDATE_CAPTURE_DATA",
@@ -99,7 +98,6 @@ def main():
     # ----------------------------------------------------------------------------------------------------------------
     # Scenario: Manual review triggered by XPN task and then Manual review task results in "continue",
     # this should result in continuing the task after XPN Task
-    # {{CAMUNDA_REST_URL}}/history/activity-instance?processInstanceId=da134b1b-11f1-11eb-8a45-0242ac130003&sortBy=startTime&sortOrder=asc
     # topics = [
     #     (["REQUEST_IDV_DATA", "UPDATE_IDV_DATA",
     #       "REQUEST_CAPTURE_DATA", "UPDATE_CAPTURE_DATA",
@@ -109,10 +107,10 @@ def main():
     #     ("UPDATE_MANUAL_REVIEW", continue_next_task),
     # ]
     # ----------------------------------------------------------------------------------------------------------------
-    # Scenario: Manual review triggered by XPN task and then workflow waits at Update Manual review task.
-    # REJECT_APPLICATION message is sent to reject the application.
-    # It should invoke the Reject application process, but instead getting error:
-    # org.camunda.bpm.engine.MismatchingMessageCorrelationException: Cannot correlate message 'REJECT_APPLICATION': No process definition or execution matches the parameters
+    # # Scenario: Manual review triggered by XPN task and then workflow waits at Update Manual review task.
+    # # REJECT_APPLICATION message is sent to reject the application.
+    # # It should invoke the Reject application process.
+    # # {{CAMUNDA_REST_URL}}/history/activity-instance?processInstanceId=5c4d82d1-1227-11eb-bea7-0242ac130003&sortBy=startTime&sortOrder=asc
     # topics = [
     #     (["REQUEST_IDV_DATA", "UPDATE_IDV_DATA",
     #       "REQUEST_CAPTURE_DATA", "UPDATE_CAPTURE_DATA",
@@ -121,18 +119,18 @@ def main():
     #     ("REQUEST_MANUAL_REVIEW", task_complete_success),
     # ]
     # ----------------------------------------------------------------------------------------------------------------
-    # Scenario: Update product acceptance raises "close" error to close the application
-    # topics = [
-    #     (["REQUEST_IDV_DATA", "UPDATE_IDV_DATA",
-    #       "REQUEST_CAPTURE_DATA", "UPDATE_CAPTURE_DATA",
-    #       "REQUEST_CREDIT_PULL_CONSENT", "UPDATE_CREDIT_PULL_CONSENT"], task_complete_success),
-    #     ("XPN_CREDIT_PULL", trigger_manual_review),
-    # ]
-    # ----------------------------------------------------------------------------------------------------------------
+    # Scenario: Manual review triggered by XPN task and then
+    # Update Manual review task raises needs_info error to trigger Needs Info sub process
+    # REJECT_APPLICATION message is sent to reject the application. It should invoke the Reject application process.
+    # {{CAMUNDA_REST_URL}}/history/activity-instance?processInstanceId=db75ffa0-1227-11eb-bea7-0242ac130003&sortBy=startTime&sortOrder=asc
     topics = [
-        ("STEP_1", task_complete_success),
-        ("STEP_2", trigger_manual_review),
+        (["REQUEST_IDV_DATA", "UPDATE_IDV_DATA",
+          "REQUEST_CAPTURE_DATA", "UPDATE_CAPTURE_DATA",
+          "REQUEST_CREDIT_PULL_CONSENT", "UPDATE_CREDIT_PULL_CONSENT"], task_complete_success),
+        ("XPN_CREDIT_PULL", trigger_manual_review),
         ("REQUEST_MANUAL_REVIEW", task_complete_success),
+        ("UPDATE_MANUAL_REVIEW", move_to_needs_info),
+        ("REQUEST_NEEDS_INFO", task_complete_success),
     ]
     # ----------------------------------------------------------------------------------------------------------------
     # ("REQUEST_NEEDS_INFO", task_complete_success),
