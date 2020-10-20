@@ -1,5 +1,4 @@
 import logging
-from http import HTTPStatus
 
 import requests
 
@@ -22,11 +21,13 @@ class EngineClient:
             return f"{self.engine_base_url}/process-definition/key/{process_key}/tenant-id/{tenant_id}/start"
         return f"{self.engine_base_url}/process-definition/key/{process_key}/start"
 
-    def start_process(self, process_key, variables, tenant_id=None):
+    def start_process(self, process_key, variables, tenant_id=None, business_key=None):
         url = self.get_start_process_instance_url(process_key, tenant_id)
         body = {
             "variables": Variables.format(variables)
         }
+        if business_key:
+            body["businessKey"] = business_key
 
         response = requests.post(url, headers=self._get_headers(), json=body)
         raise_exception_if_not_ok(response)
@@ -55,3 +56,34 @@ class EngineClient:
         return {
             "Content-Type": "application/json"
         }
+
+    def correlate_message(self, message_name, process_instance_id=None, tenant_id=None, business_key=None,
+                          process_variables=None):
+        """
+        Correlates a message to the process engine to either trigger a message start event or
+        an intermediate message catching event.
+        :param message_name:
+        :param process_instance_id:
+        :param tenant_id:
+        :param business_key:
+        :param process_variables:
+        :return: response json
+        """
+        url = f"{self.engine_base_url}/message"
+        body = {
+            "messageName": message_name,
+            "withoutTenantId": not tenant_id,
+            "resultEnabled": True,
+        }
+        self.__add_if_present(body, "processVariables", Variables.format(process_variables))
+        self.__add_if_present(body, "processInstanceId", process_instance_id)
+        self.__add_if_present(body, "tenantId", tenant_id)
+        self.__add_if_present(body, "businessKey", business_key)
+
+        response = requests.post(url, headers=self._get_headers(), json=body)
+        raise_exception_if_not_ok(response)
+        return response.json()
+
+    def __add_if_present(self, payload, field_name, field_value):
+        if field_value:
+            payload[field_name] = field_value
