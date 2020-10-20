@@ -72,18 +72,16 @@ class EngineClient:
         url = f"{self.engine_base_url}/message"
         body = {
             "messageName": message_name,
-            "withoutTenantId": not tenant_id,
             "resultEnabled": True,
+            "processVariables": Variables.format(process_variables) if process_variables else None,
+            "processInstanceId": process_instance_id,
+            "tenantId": tenant_id,
+            "withoutTenantId": not tenant_id,
+            "businessKey": business_key,
         }
-        self.__add_if_present(body, "processVariables", Variables.format(process_variables))
-        self.__add_if_present(body, "processInstanceId", process_instance_id)
-        self.__add_if_present(body, "tenantId", tenant_id)
-        self.__add_if_present(body, "businessKey", business_key)
+
+        body = {k: v for k, v in body.items() if v is not None}
 
         response = requests.post(url, headers=self._get_headers(), json=body)
         raise_exception_if_not_ok(response)
         return response.json()
-
-    def __add_if_present(self, payload, field_name, field_value):
-        if field_value:
-            payload[field_name] = field_value
