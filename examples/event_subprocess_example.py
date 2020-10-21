@@ -20,19 +20,34 @@ default_config = frozendict({
 })
 
 
-def generic_task_handler(task: ExternalTask):
+def complete(task: ExternalTask):
     log_context = frozendict({"WORKER_ID": task.get_worker_id(), "TASK_ID": task.get_task_id(),
                               "TOPIC": task.get_topic_name()})
     log_with_context("executing generic task handler", log_context)
     return task.complete()
 
 
+def continue_next_task(task: ExternalTask):
+    return task.complete({"result": "continue"})
+
+
+def retry_last_task(task: ExternalTask):
+    return task.complete({"result": "retry"})
+
+
+def trigger_review(task: ExternalTask):
+    error_task_id = task.get_activity_id()
+    return task.bpmn_error("review", "Moving to Review",
+                           {"errorTaskId": error_task_id,
+                            "reason": f"Review needed for {error_task_id} reason"})
+
+
 def main():
     configure_logging()
     topics = [
-        ("STEP_1", generic_task_handler),
-        # ("STEP_2", generic_task_handler),
-        # ("CLEAN_UP", generic_task_handler),
+        ("STEP_1", complete),
+        ("STEP_2", trigger_review),
+        # ("REVIEW", retry_last_task),
     ]
     executor = ThreadPoolExecutor(max_workers=len(topics))
     for index, topic_handler in enumerate(topics):
